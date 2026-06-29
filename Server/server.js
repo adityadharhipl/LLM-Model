@@ -17,6 +17,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('API is running successfully!');
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/chat', chatRoutes);
 
