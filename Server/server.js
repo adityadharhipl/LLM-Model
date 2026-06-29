@@ -39,7 +39,7 @@ app.use(cors({
 }));
 
 // Handle preflight requests explicitly for Vercel
-app.options('*', cors());
+app.options('/{*path}', cors());
 
 app.use(express.json());
 
