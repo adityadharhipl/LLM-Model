@@ -104,7 +104,14 @@ export const ChatProvider = ({ children }) => {
 
     try {
       const currentApiKey = apiKeys[selectedModel];
-      const response = await sendMessage(content, selectedModel, currentApiKey);
+      
+      // Get the existing messages before the new user message was added to use as history
+      const currentChat = chats.find(c => c.id === currentChatId);
+      const history = currentChat ? currentChat.messages : [];
+      // Don't include the error messages in history to avoid confusing the AI
+      const cleanHistory = history.filter(msg => msg.role !== 'error');
+
+      const response = await sendMessage(content, cleanHistory, selectedModel, currentApiKey);
       const aiMessage = { role: 'ai', content: response.reply || "No response received" };
       
       setChats(prev => prev.map(chat => 

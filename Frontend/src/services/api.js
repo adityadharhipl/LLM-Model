@@ -15,7 +15,7 @@ const getAuthToken = () => {
   return null;
 };
 
-export const sendMessage = async (message, model, apiKey) => {
+export const sendMessage = async (message, history, model, apiKey) => {
   try {
     const token = getAuthToken();
     const config = {
@@ -25,7 +25,7 @@ export const sendMessage = async (message, model, apiKey) => {
       }
     };
     
-    const response = await axios.post(`${API_URL}/api/chat`, { message, model, apiKey }, config);
+    const response = await axios.post(`${API_URL}/api/chat`, { message, history, model, apiKey }, config);
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
