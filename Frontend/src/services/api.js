@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://llm-model-gew3.vercel.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://llm-model-g51b.vercel.app';
 
 const getAuthToken = () => {
   const userStr = localStorage.getItem('ai_chat_user');
