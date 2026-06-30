@@ -7,7 +7,7 @@ import SettingsModal from '../components/SettingsModal/SettingsModal';
 
 const Home = () => {
   return (
-    <div className="flex h-screen w-full bg-bg-dark overflow-hidden font-sans">
+    <div className="flex h-[100dvh] w-full bg-bg-dark overflow-hidden font-sans relative">
       <Sidebar />
       <div className="flex-1 flex flex-col h-full relative">
         <Navbar />

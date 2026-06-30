@@ -14,8 +14,10 @@
 }
 
 @layer base {
-  html, body {
-    @apply h-full bg-bg-chat text-text-light antialiased;
+  html, body, #root {
+    @apply h-full bg-bg-chat text-text-light antialiased overflow-hidden w-full;
+    position: fixed;
+    inset: 0;
   }
 
   /* Custom scrollbar */
