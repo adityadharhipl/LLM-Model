@@ -26,6 +26,17 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post(`${API_URL}/api/auth/login`, { email, password });
       setUser(response.data);
+      
+      const backupChats = localStorage.getItem('ai_chats_backup');
+      if (backupChats) {
+        localStorage.setItem('ai_chats', backupChats);
+        const backupId = localStorage.getItem('ai_active_chat_id_backup');
+        if (backupId && backupId !== 'null') {
+          localStorage.setItem('ai_active_chat_id', backupId);
+        }
+        window.dispatchEvent(new Event('restore-chat-backup'));
+      }
+
       return { success: true };
     } catch (error) {
       return { success: false, error: error.response?.data?.error || 'Login failed' };

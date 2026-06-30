@@ -22,12 +22,27 @@ const Sidebar = () => {
     chat.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleChatSelect = (id) => {
+    setActiveChatId(id);
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
-    <div className={cn(
-      "flex flex-col h-full bg-bg-sidebar transition-all duration-300 border-r border-border-dark",
-      isSidebarOpen ? "w-[260px]" : "w-0 overflow-hidden border-none"
-    )}>
+    <>
+      {/* Mobile Backdrop */}
       {isSidebarOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-30" 
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <div className={cn(
+        "flex flex-col h-full bg-bg-sidebar transition-all duration-300 border-r border-border-dark absolute md:relative z-40 left-0 top-0 bottom-0",
+        isSidebarOpen ? "w-[260px] translate-x-0" : "w-0 overflow-hidden border-none -translate-x-full md:translate-x-0 md:w-0"
+      )}>
+        {isSidebarOpen && (
         <>
           <div className="p-3">
             <button
@@ -60,7 +75,7 @@ const Sidebar = () => {
                     "group relative flex items-center gap-3 p-3 rounded-md cursor-pointer hover:bg-gray-700/50 transition-colors",
                     activeChatId === chat.id ? "bg-gray-700/80" : ""
                   )}
-                  onClick={() => setActiveChatId(chat.id)}
+                  onClick={() => handleChatSelect(chat.id)}
                 >
                   <MessageSquare size={16} className="text-gray-300" />
                   
@@ -145,6 +160,7 @@ const Sidebar = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 

@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { useChat } from '../../hooks/useChat';
 
 const SettingsModal = () => {
-  const { isSettingsOpen, setSettingsOpen, selectedModel, setSelectedModel, apiKeys, setApiKeys } = useChat();
+  const { isSettingsOpen, setSettingsOpen, selectedModel, setSelectedModel, apiKeys, setApiKeys, backupChatHistory, restoreChatHistory } = useChat();
 
   const [localKeys, setLocalKeys] = useState(apiKeys);
 
@@ -35,7 +35,15 @@ const SettingsModal = () => {
             <label className="block text-sm font-medium text-gray-300 mb-2">Select AI Model</label>
             <select 
               value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
+              onChange={(e) => {
+                if (backupChatHistory && restoreChatHistory) {
+                  backupChatHistory();
+                  setSelectedModel(e.target.value);
+                  setTimeout(() => restoreChatHistory(), 0);
+                } else {
+                  setSelectedModel(e.target.value);
+                }
+              }}
               className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-blue-500"
             >
               <option value="gemini">Google Gemini (gemini-1.5-flash)</option>

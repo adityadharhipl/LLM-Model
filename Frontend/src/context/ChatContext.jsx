@@ -47,6 +47,21 @@ export const ChatProvider = ({ children }) => {
     }
   }, [activeChatId]);
 
+  useEffect(() => {
+    const handleRestore = () => {
+      const savedBackup = localStorage.getItem('ai_chats_backup');
+      const savedActiveId = localStorage.getItem('ai_active_chat_id_backup');
+      if (savedBackup) {
+        setChats(JSON.parse(savedBackup));
+        if (savedActiveId && savedActiveId !== 'null') {
+          setActiveChatId(savedActiveId);
+        }
+      }
+    };
+    window.addEventListener('restore-chat-backup', handleRestore);
+    return () => window.removeEventListener('restore-chat-backup', handleRestore);
+  }, []);
+
   const createNewChat = () => {
     const newChat = {
       id: Date.now().toString(),
@@ -119,6 +134,16 @@ export const ChatProvider = ({ children }) => {
       ));
     } catch (err) {
       setError(err.message);
+      
+      const errMsg = err.message.toLowerCase();
+      if (errMsg.includes('not authorized') || errMsg.includes('token') || errMsg.includes('401')) {
+        // Auto-save history on token expiration
+        const currentChats = localStorage.getItem('ai_chats');
+        const currentId = localStorage.getItem('ai_active_chat_id');
+        if (currentChats) localStorage.setItem('ai_chats_backup', currentChats);
+        if (currentId) localStorage.setItem('ai_active_chat_id_backup', currentId);
+      }
+
       // Optional: Add an error message to the chat
       const errorMessage = { role: 'error', content: err.message };
       setChats(prev => prev.map(chat => 
@@ -126,6 +151,28 @@ export const ChatProvider = ({ children }) => {
       ));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const backupChatHistory = () => {
+    const currentChats = localStorage.getItem('ai_chats');
+    const currentId = localStorage.getItem('ai_active_chat_id');
+    if (currentChats) {
+      localStorage.setItem('ai_chats_backup', currentChats);
+    }
+    if (currentId) {
+      localStorage.setItem('ai_active_chat_id_backup', currentId);
+    }
+  };
+
+  const restoreChatHistory = () => {
+    const savedBackup = localStorage.getItem('ai_chats_backup');
+    const savedActiveId = localStorage.getItem('ai_active_chat_id_backup');
+    if (savedBackup) {
+      setChats(JSON.parse(savedBackup));
+      if (savedActiveId && savedActiveId !== 'null') {
+        setActiveChatId(savedActiveId);
+      }
     }
   };
 
@@ -151,6 +198,8 @@ export const ChatProvider = ({ children }) => {
       setApiKeys,
       isLoading,
       error,
+      backupChatHistory,
+      restoreChatHistory,
     }}>
       {children}
     </ChatContext.Provider>
