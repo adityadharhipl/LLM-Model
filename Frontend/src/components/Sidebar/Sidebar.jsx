@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, MessageSquare, Trash2, Edit2, PanelLeftClose, User, Check, X, Search } from 'lucide-react';
 import { SwipeableDrawer } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useChat } from '../../hooks/useChat';
 import { useAuth } from '../../hooks/useAuth';
 import { cn } from '../../utils/classNames';
@@ -11,6 +12,8 @@ const Sidebar = () => {
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const isMobile = useMediaQuery('(max-width:768px)');
 
   const handleRenameSubmit = (id) => {
     if (editTitle.trim()) {
@@ -162,7 +165,7 @@ const Sidebar = () => {
       <div className="md:hidden">
         <SwipeableDrawer
           anchor="left"
-          open={isSidebarOpen}
+          open={isSidebarOpen && isMobile}
           onClose={() => setSidebarOpen(false)}
           onOpen={() => setSidebarOpen(true)}
           PaperProps={{
