@@ -151,13 +151,11 @@ const Sidebar = () => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex">
-        <div className={cn(
-          "flex flex-col h-full bg-bg-sidebar transition-all duration-300 border-r border-border-dark relative z-40 left-0 top-0 bottom-0",
-          isSidebarOpen ? "w-[260px] translate-x-0" : "w-0 overflow-hidden border-none -translate-x-full md:translate-x-0 md:w-0"
-        )}>
-          {isSidebarOpen && sidebarContent}
-        </div>
+      <div className={cn(
+        "hidden md:flex flex-col h-full bg-bg-sidebar transition-all duration-300 border-r border-border-dark relative z-40 left-0 top-0 bottom-0",
+        isSidebarOpen ? "w-[260px] translate-x-0" : "w-0 overflow-hidden border-none -translate-x-full md:translate-x-0 md:w-0"
+      )}>
+        {isSidebarOpen && sidebarContent}
       </div>
 
       {/* Mobile Sidebar via MUI */}
