@@ -21,7 +21,7 @@ export const handleChat = async (req, res) => {
       if (selectedModel === 'groq' && process.env.GROQ_API_KEY) key = process.env.GROQ_API_KEY.trim();
     }
 
-    if (!key) {
+    if (!key && selectedModel !== 'ollama') {
       return res.status(400).json({ error: `API Key for ${selectedModel} is missing. Please provide it in the settings.` });
     }
 
@@ -60,6 +60,21 @@ export const handleChat = async (req, res) => {
       const chatCompletion = await groq.chat.completions.create({
         messages: [...formattedHistory, { role: 'user', content: message }],
         model: 'llama-3.1-8b-instant',
+      });
+      reply = chatCompletion.choices[0].message.content;
+    } else if (selectedModel === 'ollama') {
+      const ollama = new OpenAI({
+        baseURL: 'http://localhost:11434/v1',
+        apiKey: 'ollama', // API key is required by the SDK but ignored by Ollama
+      });
+      const formattedHistory = history.map(msg => ({
+        role: msg.role === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+      
+      const chatCompletion = await ollama.chat.completions.create({
+        messages: [...formattedHistory, { role: 'user', content: message }],
+        model: key || 'llama3', // Use the provided 'apiKey' field as the model name for Ollama, default to llama3
       });
       reply = chatCompletion.choices[0].message.content;
     } else {

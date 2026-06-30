@@ -49,6 +49,7 @@ const SettingsModal = () => {
               <option value="gemini">Google Gemini (gemini-1.5-flash)</option>
               <option value="openai">OpenAI (gpt-3.5-turbo)</option>
               <option value="groq">Groq (llama-3.1-8b-instant)</option>
+              <option value="ollama">Ollama (Offline - Local Models)</option>
             </select>
           </div>
 
@@ -81,9 +82,20 @@ const SettingsModal = () => {
               <label className="block text-xs text-gray-400 mb-1">Groq API Key</label>
               <input 
                 type="password"
-                value={localKeys.groq}
+                value={localKeys.groq || ''}
                 onChange={(e) => handleKeyChange('groq', e.target.value)}
                 placeholder="gsk_..."
+                className="w-full bg-gray-800/50 border border-gray-600/50 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">Ollama Model Name (Offline)</label>
+              <input 
+                type="text"
+                value={localKeys.ollama || ''}
+                onChange={(e) => handleKeyChange('ollama', e.target.value)}
+                placeholder="e.g. llama3, mistral (defaults to llama3)"
                 className="w-full bg-gray-800/50 border border-gray-600/50 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500"
               />
             </div>
