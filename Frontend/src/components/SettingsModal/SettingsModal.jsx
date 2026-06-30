@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Dialog, DialogTitle, DialogContent, DialogActions, 
+  Button, Select, MenuItem, InputLabel, FormControl, 
+  TextField, IconButton, Typography, Box, Divider
+} from '@mui/material';
 import { X } from 'lucide-react';
 import { useChat } from '../../hooks/useChat';
 
 const SettingsModal = () => {
   const { isSettingsOpen, setSettingsOpen, selectedModel, setSelectedModel, apiKeys, setApiKeys, backupChatHistory, restoreChatHistory } = useChat();
-
   const [localKeys, setLocalKeys] = useState(apiKeys);
 
-  if (!isSettingsOpen) return null;
+  // Sync local keys when modal opens
+  useEffect(() => {
+    if (isSettingsOpen) setLocalKeys(apiKeys);
+  }, [isSettingsOpen, apiKeys]);
 
   const handleSave = () => {
     setApiKeys(localKeys);
@@ -18,87 +25,152 @@ const SettingsModal = () => {
     setLocalKeys(prev => ({ ...prev, [model]: value }));
   };
 
+  const handleModelChange = (e) => {
+    const newModel = e.target.value;
+    if (backupChatHistory && restoreChatHistory) {
+      backupChatHistory();
+      setSelectedModel(newModel);
+      setTimeout(() => restoreChatHistory(), 0);
+    } else {
+      setSelectedModel(newModel);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-bg-chat w-[90%] max-w-md rounded-xl shadow-2xl border border-gray-700 p-6 relative">
-        <button 
-          onClick={() => setSettingsOpen(false)}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-200"
-        >
+    <Dialog 
+      open={isSettingsOpen} 
+      onClose={() => setSettingsOpen(false)}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          backgroundColor: '#1e1e2d', // matching bg-bg-chat or darker
+          color: '#e2e8f0',
+          borderRadius: '12px',
+          border: '1px solid #374151'
+        }
+      }}
+    >
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+        <Typography variant="h6" fontWeight="600">Settings</Typography>
+        <IconButton onClick={() => setSettingsOpen(false)} sx={{ color: '#9ca3af' }}>
           <X size={20} />
-        </button>
-
-        <h2 className="text-xl font-semibold text-gray-100 mb-6">Settings</h2>
-
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Select AI Model</label>
-            <select 
-              value={selectedModel}
-              onChange={(e) => {
-                if (backupChatHistory && restoreChatHistory) {
-                  backupChatHistory();
-                  setSelectedModel(e.target.value);
-                  setTimeout(() => restoreChatHistory(), 0);
-                } else {
-                  setSelectedModel(e.target.value);
+        </IconButton>
+      </DialogTitle>
+      
+      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: '16px !important' }}>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel sx={{ color: '#9ca3af' }}>Select AI Model</InputLabel>
+          <Select
+            value={selectedModel}
+            onChange={handleModelChange}
+            label="Select AI Model"
+            sx={{
+              color: '#e2e8f0',
+              '.MuiOutlinedInput-notchedOutline': { borderColor: '#4b5563' },
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#60a5fa' },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6' },
+              '.MuiSvgIcon-root': { color: '#9ca3af' }
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: '#1f2937',
+                  color: '#e2e8f0',
                 }
-              }}
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg p-2.5 text-gray-200 focus:outline-none focus:border-blue-500"
-            >
-              <option value="gemini">Google Gemini (gemini-1.5-flash)</option>
-              <option value="openai">OpenAI (gpt-3.5-turbo)</option>
-              <option value="groq">Groq (llama-3.1-8b-instant)</option>
-            </select>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-300 border-b border-gray-700 pb-2">API Keys</h3>
-            
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Gemini API Key</label>
-              <input 
-                type="password"
-                value={localKeys.gemini}
-                onChange={(e) => handleKeyChange('gemini', e.target.value)}
-                placeholder="AIzaSy..."
-                className="w-full bg-gray-800/50 border border-gray-600/50 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">OpenAI API Key</label>
-              <input 
-                type="password"
-                value={localKeys.openai}
-                onChange={(e) => handleKeyChange('openai', e.target.value)}
-                placeholder="sk-..."
-                className="w-full bg-gray-800/50 border border-gray-600/50 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">Groq API Key</label>
-              <input 
-                type="password"
-                value={localKeys.groq}
-                onChange={(e) => handleKeyChange('groq', e.target.value)}
-                placeholder="gsk_..."
-                className="w-full bg-gray-800/50 border border-gray-600/50 rounded-lg p-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500"
-              />
-            </div>
-          </div>
-
-          <button 
-            onClick={handleSave}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors mt-4"
+              }
+            }}
           >
-            Save Settings
-          </button>
-        </div>
-      </div>
-    </div>
+            <MenuItem value="gemini">Google Gemini (gemini-1.5-flash)</MenuItem>
+            <MenuItem value="openai">OpenAI (gpt-3.5-turbo)</MenuItem>
+            <MenuItem value="groq">Groq (llama-3.1-8b-instant)</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Box sx={{ mt: 1 }}>
+          <Typography variant="subtitle2" sx={{ color: '#9ca3af', mb: 1.5, pb: 0.5, borderBottom: '1px solid #374151' }}>
+            API Keys
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label="Gemini API Key"
+              type="password"
+              value={localKeys.gemini}
+              onChange={(e) => handleKeyChange('gemini', e.target.value)}
+              placeholder="AIzaSy..."
+              fullWidth
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ sx: { color: '#9ca3af' } }}
+              sx={{
+                input: { color: '#e2e8f0' },
+                '.MuiOutlinedInput-notchedOutline': { borderColor: '#4b5563' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#60a5fa' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6' },
+              }}
+            />
+            <TextField
+              label="OpenAI API Key"
+              type="password"
+              value={localKeys.openai}
+              onChange={(e) => handleKeyChange('openai', e.target.value)}
+              placeholder="sk-..."
+              fullWidth
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ sx: { color: '#9ca3af' } }}
+              sx={{
+                input: { color: '#e2e8f0' },
+                '.MuiOutlinedInput-notchedOutline': { borderColor: '#4b5563' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#60a5fa' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6' },
+              }}
+            />
+            <TextField
+              label="Groq API Key"
+              type="password"
+              value={localKeys.groq}
+              onChange={(e) => handleKeyChange('groq', e.target.value)}
+              placeholder="gsk_..."
+              fullWidth
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ sx: { color: '#9ca3af' } }}
+              sx={{
+                input: { color: '#e2e8f0' },
+                '.MuiOutlinedInput-notchedOutline': { borderColor: '#4b5563' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#60a5fa' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#3b82f6' },
+              }}
+            />
+          </Box>
+        </Box>
+      </DialogContent>
+      
+      <DialogActions sx={{ p: 3, pt: 1 }}>
+        <Button 
+          onClick={handleSave} 
+          variant="contained" 
+          fullWidth
+          sx={{ 
+            backgroundColor: '#2563eb', 
+            color: 'white',
+            py: 1.2,
+            textTransform: 'none',
+            fontSize: '16px',
+            fontWeight: '500',
+            borderRadius: '8px',
+            '&:hover': {
+              backgroundColor: '#1d4ed8'
+            }
+          }}
+        >
+          Save Settings
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
 export default SettingsModal;
+
