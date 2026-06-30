@@ -17,19 +17,27 @@ export const ChatProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [selectedProvider, setSelectedProvider] = useState(() => {
+    return localStorage.getItem('ai_selected_provider') || 'openrouter';
+  });
+
   const [selectedModel, setSelectedModel] = useState(() => {
-    return localStorage.getItem('ai_selected_model') || 'groq';
+    return localStorage.getItem('ai_selected_model') || 'openai/gpt-4o';
   });
 
   const [apiKeys, setApiKeys] = useState(() => {
     const saved = localStorage.getItem('ai_api_keys');
-    return saved ? JSON.parse(saved) : { gemini: '', openai: '', groq: '' };
+    return saved ? JSON.parse(saved) : { gemini: '', openai: '', groq: '', openrouter: '', huggingface: '', xai: '' };
   });
 
   // Save to local storage whenever chats change
   useEffect(() => {
     localStorage.setItem('ai_chats', JSON.stringify(chats));
   }, [chats]);
+
+  useEffect(() => {
+    localStorage.setItem('ai_selected_provider', selectedProvider);
+  }, [selectedProvider]);
 
   useEffect(() => {
     localStorage.setItem('ai_selected_model', selectedModel);
@@ -118,7 +126,7 @@ export const ChatProvider = ({ children }) => {
     setError(null);
 
     try {
-      const currentApiKey = apiKeys[selectedModel];
+      const currentApiKey = apiKeys[selectedProvider];
       
       // Get the existing messages before the new user message was added to use as history
       const currentChat = chats.find(c => c.id === currentChatId);
@@ -126,7 +134,7 @@ export const ChatProvider = ({ children }) => {
       // Don't include the error messages in history to avoid confusing the AI
       const cleanHistory = history.filter(msg => msg.role !== 'error');
 
-      const response = await sendMessage(content, cleanHistory, selectedModel, currentApiKey);
+      const response = await sendMessage(content, cleanHistory, selectedProvider, selectedModel, currentApiKey);
       const aiMessage = { role: 'ai', content: response.reply || "No response received" };
       
       setChats(prev => prev.map(chat => 
@@ -192,6 +200,8 @@ export const ChatProvider = ({ children }) => {
       setSidebarOpen,
       isSettingsOpen,
       setSettingsOpen,
+      selectedProvider,
+      setSelectedProvider,
       selectedModel,
       setSelectedModel,
       apiKeys,
