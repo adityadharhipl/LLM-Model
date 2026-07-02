@@ -26,9 +26,10 @@ export const handleChat = async (req, res) => {
     }
 
     if (selectedModel === 'gemini') {
+      console.log("Selected model:", selectedModel);
+      console.log("Using Gemini model:", "gemini-2.5-flash");
       const genAI = new GoogleGenerativeAI(key);
       const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      // const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       const formattedHistory = history.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
@@ -68,7 +69,7 @@ export const handleChat = async (req, res) => {
     }
 
   } catch (error) {
-    console.error('Error generating AI response:', error);
+    console.error(error);
     reply = `Sorry, there was an error connecting to the AI service: ${error.message}`;
   }
 
