@@ -81,7 +81,8 @@ const SettingsModal = () => {
               }
             }}
           >
-            <MenuItem value="gemini">Google Gemini (gemini-1.5-flash)</MenuItem>
+            <MenuItem value="gemini">Google Gemini (gemini-2.5-flash)</MenuItem>
+            {/* <MenuItem value="gemini">Google Gemini (gemini-1.5-flash)</MenuItem> */}
             <MenuItem value="openai">OpenAI (gpt-3.5-turbo)</MenuItem>
             <MenuItem value="groq">Groq (llama-3.1-8b-instant)</MenuItem>
           </Select>

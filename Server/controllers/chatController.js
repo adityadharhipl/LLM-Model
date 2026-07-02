@@ -27,7 +27,8 @@ export const handleChat = async (req, res) => {
 
     if (selectedModel === 'gemini') {
       const genAI = new GoogleGenerativeAI(key);
-      const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      // const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       const formattedHistory = history.map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
